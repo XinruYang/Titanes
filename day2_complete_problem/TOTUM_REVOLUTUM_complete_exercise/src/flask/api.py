@@ -1,24 +1,31 @@
-"""
+import json
+from flask import Flask
+import os, sys
 
-Crea una API flask con un solo endpoint que muestre por pantalla el json 'googleplaystore.json'
-de la carpeta /data. En resumen, el endpoint tiene que leer el fichero 'googleplaystore.json' y retornarlo.
+ruta = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(ruta)
 
-Además, este fichero contiene otra función que está fuera de la funcionalidad de la API flask
+from streamlit import config
+from utils_.flask_functions import funcion_flask_1
 
-"""
-
-""" 1: No es una función de flask"""
 def mi_funcion():
-    """
-    TODO - Esta función ha de llamar a la función 'funcion_flask_1' que está en /utils/flask_functions.py y
-    mostrar por pantalla lo que retorne esa función. 
-    """
-    pass
+    print(funcion_flask_1())
 
 
-""" PARTE PURA DE FLASK """
 if __name__ == '__main__':
-    """ Todo lo que está aquí debajo tiene que ver con la funcionalidad del flask """
+    app = Flask(__name__)
+
+    @app.route('/', methods=['GET'])
+    def home():
+        with open(os.path.dirname(ruta) + '/data/googleplaystore.json', 'r+') as json_file:
+            google_play_store = json.load(json_file)
+        return google_play_store
+
+    with open(os.path.dirname(ruta) + '/config/flask_settings.json', 'r+') as json_file:
+        config = json.load(json_file)
     
-    """2"""
-    pass
+    app.run(
+        host = config['host'],
+        port = config['port'],
+        debug =config['debug']
+    )
